@@ -11,6 +11,8 @@ import {
 import { poseImages } from "../data";
 import { ExpoWebGLRenderingContext } from "expo-gl";
 import { autoRender, outputTensorHeight, outputTensorWidth } from "../contants";
+import * as posedetection from "@tensorflow-models/pose-detection";
+import { loadMoveNetModel } from "../../model";
 
 export const PoseScreen = ({ route }: { route: any }): ReactElement => {
   const { pose } = route.params;
@@ -20,6 +22,7 @@ export const PoseScreen = ({ route }: { route: any }): ReactElement => {
   const [cameraType, setCameraType] = useState<CameraType>(
     Camera.Constants.Type.front
   );
+  const [model, setModel] = useState<posedetection.PoseDetector>();
 
   useEffect(() => {
     async function prepare() {
@@ -28,6 +31,8 @@ export const PoseScreen = ({ route }: { route: any }): ReactElement => {
 
       // Wait for tfjs to initialize the backend.
       await tf.ready();
+      const movenetModel = await loadMoveNetModel();
+      setModel(movenetModel);
       setTfReady(true);
     }
 
@@ -41,6 +46,12 @@ export const PoseScreen = ({ route }: { route: any }): ReactElement => {
   ) => {
     const loop = async () => {
       const imageTensor = images.next().value as tf.Tensor3D;
+
+      const poses = await model!.estimatePoses(
+        imageTensor,
+        undefined,
+        Date.now()
+      );
       tf.dispose([imageTensor]);
       if (rafId.current === 0) {
         return;
