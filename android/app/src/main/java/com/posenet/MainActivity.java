@@ -1,5 +1,5 @@
 package com.posenet;
-
+import android.os.Bundle;
 import android.os.Bundle;
 
 import com.facebook.react.ReactActivity;
@@ -37,5 +37,9 @@ public class MainActivity extends ReactActivity {
                 return new RNGestureHandlerEnabledRootView(MainActivity.this);
             }
         };
+    }
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+    super.onCreate(null);
     }
 }
