@@ -11,7 +11,9 @@ import {
 } from "../contants";
 import { Camera, CameraType } from "expo-camera";
 import Svg, { Circle, Line } from "react-native-svg";
-import { keypointConnections } from "../data";
+import { classNo, keypointConnections } from "../data";
+import * as tf from "@tensorflow/tfjs";
+import { landMarksToEmbedding } from "../helper";
 
 type PoseSkeletonProps = {
   poses: posedetection.Pose[] | undefined;
@@ -24,6 +26,9 @@ export const PoseSkeleton: FC<PoseSkeletonProps> = ({
 }): ReactElement => {
   const [keypoints, setKeypoints] = useState<ReactElement[] | null>([]);
   const [lines, setLines] = useState<ReactElement[] | null>([]);
+  const [tfReady, setTfReady] = useState(false);
+  const [poseClassifier, setPoseClassifier] = useState<any>(null);
+  const [input, setInput] = useState<any>(null);
 
   useEffect(() => {
     if (poses != null && poses.length > 0) {
@@ -83,11 +88,42 @@ export const PoseSkeleton: FC<PoseSkeletonProps> = ({
 
       setKeypoints(keypointElements);
       setLines(lineElements);
+      let input = poses[0].keypoints?.map((keypoint) => {
+        return [keypoint.x, keypoint.y];
+      });
+      setInput(input);
     } else {
       setKeypoints([]);
       setLines([]);
     }
   }, [poses, cameraType]);
+
+  useEffect(() => {
+    async function prepare() {
+      await tf.ready();
+      const poseClassifierModel = await tf.loadLayersModel(
+        "https://models.s3.jp-tok.cloud-object-storage.appdomain.cloud/model.json"
+      );
+      setPoseClassifier(poseClassifierModel);
+      setTfReady(true);
+    }
+
+    prepare();
+  }, []);
+
+  if (input) {
+    const processedInput = landMarksToEmbedding(input);
+    const classification = poseClassifier.predict(processedInput);
+    classification.array().then((data: any) => {
+      const result = classNo.Tree;
+      console.log(data[0], "accracy");
+      if (data[0][result] > 0.97) {
+        console.log("pose name is", result);
+      } else {
+        console.log("there some errors");
+      }
+    });
+  }
 
   return (
     <Svg style={styles.svg}>

@@ -88,7 +88,7 @@ export const poseImages = {
   Shoulderstand: shoulderstand,
 };
 
-export const POINTS = {
+export const points = {
   NOSE: 0,
   LEFT_EYE: 1,
   RIGHT_EYE: 2,
@@ -126,7 +126,7 @@ export const keypointConnections = [
   { from: "right_knee", to: "right_ankle" },
 ];
 
-export const CLASS_NO = {
+export const classNo = {
   Chair: 0,
   Cobra: 1,
   Dog: 2,
