@@ -1,42 +1,47 @@
-import React, { ReactElement, useEffect, useRef, useState } from "react";
-import { StyleSheet, Image, View, Text } from "react-native";
-import * as tf from "@tensorflow/tfjs";
-import { Camera, CameraType } from "expo-camera";
-
-import { SafeAreaView } from "react-native-safe-area-context";
-import {
-  bundleResourceIO,
-  cameraWithTensors,
-} from "@tensorflow/tfjs-react-native";
-import { poseImages } from "../data";
-import { ExpoWebGLRenderingContext } from "expo-gl";
-import { autoRender, outputTensorHeight, outputTensorWidth } from "../contants";
 import * as posedetection from "@tensorflow-models/pose-detection";
+import * as tf from "@tensorflow/tfjs";
+import { cameraWithTensors } from "@tensorflow/tfjs-react-native";
+import { Camera } from "expo-camera";
+import { CameraType } from "expo-camera/build/Camera.types";
+import { ExpoWebGLRenderingContext } from "expo-gl";
+import React, { useEffect, useRef, useState } from "react";
+import { Dimensions, StyleSheet, Text, View } from "react-native";
 import { loadMoveNetModel } from "../../model";
+import PoseSkeleton from "../components/PoseSkeleton";
+import { autoRender, outputTensorHeight, outputTensorWidth } from "../contants";
 
-export const PoseScreen = ({ route }: { route: any }): ReactElement => {
-  const { pose } = route.params;
-  const TensorCamera = cameraWithTensors(Camera);
+const TensorCamera = cameraWithTensors(Camera);
+
+export const PoseScreen = () => {
+  const cameraRef = useRef(null);
   const [tfReady, setTfReady] = useState(false);
-  const rafId = useRef<number | null>(null);
-  const [cameraType, setCameraType] = useState<CameraType>(
-    Camera.Constants.Type.front
-  );
   const [model, setModel] = useState<posedetection.PoseDetector>();
+  const [poses, setPoses] = useState<posedetection.Pose[]>();
+  const [cameraType, setCameraType] = useState<CameraType>(
+    Camera.Constants.Type.back
+  );
+  const rafId = useRef<number | null>(null);
 
   useEffect(() => {
     async function prepare() {
-      // Camera permission.
+      rafId.current = null;
       await Camera.requestCameraPermissionsAsync();
-
-      // Wait for tfjs to initialize the backend.
       await tf.ready();
-      const movenetModel = await loadMoveNetModel();
-      setModel(movenetModel);
+      const model = await loadMoveNetModel();
+      setModel(model);
       setTfReady(true);
     }
 
     prepare();
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (rafId.current != null && rafId.current !== 0) {
+        cancelAnimationFrame(rafId.current);
+        rafId.current = 0;
+      }
+    };
   }, []);
 
   const handleCameraStream = async (
@@ -52,44 +57,62 @@ export const PoseScreen = ({ route }: { route: any }): ReactElement => {
         undefined,
         Date.now()
       );
+      setPoses(poses);
       tf.dispose([imageTensor]);
+
       if (rafId.current === 0) {
         return;
       }
+
       if (!autoRender) {
         updatePreview();
         gl.endFrameEXP();
       }
+
       rafId.current = requestAnimationFrame(loop);
     };
+
     loop();
   };
 
   if (!tfReady) {
-    return <Text>loading the camera</Text>;
+    return (
+      <View style={styles.loadingMsg}>
+        <Text>Loading...</Text>
+      </View>
+    );
   } else {
     return (
-      <SafeAreaView style={styles.container}>
+      <View style={styles.container}>
         <TensorCamera
+          ref={cameraRef}
           style={styles.camera}
           autorender={autoRender}
           type={cameraType}
-          resizeDepth={3}
           resizeWidth={outputTensorWidth}
           resizeHeight={outputTensorHeight}
+          resizeDepth={3}
           onReady={handleCameraStream}
         />
-      </SafeAreaView>
+        <PoseSkeleton poses={poses} cameraType={cameraType} />
+      </View>
     );
   }
 };
 
-export default PoseScreen;
-
 const styles = StyleSheet.create({
   container: {
     position: "relative",
-    flex: 1,
+    width: Dimensions.get("window").width,
+    height: Dimensions.get("window").height,
+  },
+
+  loadingMsg: {
+    position: "absolute",
+    width: "100%",
+    height: "100%",
+    alignItems: "center",
+    justifyContent: "center",
   },
   camera: {
     width: "100%",

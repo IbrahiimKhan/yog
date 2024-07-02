@@ -108,16 +108,31 @@ export const POINTS = {
   RIGHT_ANKLE: 16,
 };
 
-export const keypointConnections = {
-  nose: ["left_ear", "right_ear"],
-  left_ear: ["left_shoulder"],
-  right_ear: ["right_shoulder"],
-  left_shoulder: ["right_shoulder", "left_elbow", "left_hip"],
-  right_shoulder: ["right_elbow", "right_hip"],
-  left_elbow: ["left_wrist"],
-  right_elbow: ["right_wrist"],
-  left_hip: ["left_knee", "right_hip"],
-  right_hip: ["right_knee"],
-  left_knee: ["left_ankle"],
-  right_knee: ["right_ankle"],
+export const keypointConnections = [
+  { from: "nose", to: "left_eye" },
+  { from: "right_eye", to: "nose" },
+  { from: "left_eye", to: "left_ear" },
+  { from: "right_eye", to: "right_ear" },
+  { from: "left_shoulder", to: "right_shoulder" },
+  { from: "right_shoulder", to: "right_elbow" },
+  { from: "right_elbow", to: "right_wrist" },
+  { from: "left_shoulder", to: "left_elbow" },
+  { from: "left_elbow", to: "left_wrist" },
+  { from: "left_shoulder", to: "left_hip" },
+  { from: "left_hip", to: "left_knee" },
+  { from: "left_knee", to: "left_ankle" },
+  { from: "right_shoulder", to: "right_hip" },
+  { from: "right_hip", to: "right_knee" },
+  { from: "right_knee", to: "right_ankle" },
+];
+
+export const CLASS_NO = {
+  Chair: 0,
+  Cobra: 1,
+  Dog: 2,
+  No_Pose: 3,
+  Shoulderstand: 4,
+  Traingle: 5,
+  Tree: 6,
+  Warrior: 7,
 };
