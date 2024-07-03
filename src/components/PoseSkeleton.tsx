@@ -16,20 +16,27 @@ import {
 import { classNo, keypointConnections } from "../data";
 
 interface PoseSkeletonProps {
+  poseName: string;
   poses: any;
   poseClassifier: any;
   cameraType: any;
+  handleTimer: (value: boolean) => void;
+  timerStarted: boolean;
 }
 
 const PoseSkeleton: FC<PoseSkeletonProps> = ({
+  poseName,
   poses,
   poseClassifier,
   cameraType,
+  handleTimer,
+  timerStarted,
 }) => {
   if (!poses || poses.length === 0) {
     return <View />;
   }
   const [skeletonColor, setSkeletonColor] = useState<string>("red");
+
   const renderPose = () => {
     let input = poses[0].keypoints?.map((keypoint: any) => {
       return [keypoint.x, keypoint.y];
@@ -40,8 +47,14 @@ const PoseSkeleton: FC<PoseSkeletonProps> = ({
       const pose = classNo.Warrior;
       if (data[0][pose] > 0.9) {
         console.log(data[0][pose], "accuracy");
+        if (!timerStarted) {
+          handleTimer(true);
+        }
         setSkeletonColor("green");
       } else {
+        if (timerStarted) {
+          handleTimer(false);
+        }
         setSkeletonColor("red");
       }
     });

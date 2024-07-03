@@ -5,7 +5,8 @@ import { Camera } from "expo-camera";
 import { CameraType } from "expo-camera/build/Camera.types";
 import { ExpoWebGLRenderingContext } from "expo-gl";
 import React, { useEffect, useRef, useState } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { Image, StyleSheet, View } from "react-native";
+import { ActivityIndicator, Text } from "react-native-paper";
 import { loadMoveNetModel } from "../../model";
 import PoseSkeleton from "../components/PoseSkeleton";
 import {
@@ -13,11 +14,14 @@ import {
   cameraPreViewHeight,
   cameraPreViewWidth,
 } from "../contants";
+import { poseImages } from "../data";
 import { getOutputTensorHeight, getOutputTensorWidth } from "../helper";
+import CircularProgressBar from "../components/CircularProgressBar";
 
 const TensorCamera = cameraWithTensors(Camera);
 
-export const PoseScreen = () => {
+export const PoseScreen = ({ route }: any) => {
+  const { pose } = route.params;
   const cameraRef = useRef(null);
   const rafId = useRef<number | null>(null);
   const [tfReady, setTfReady] = useState(false);
@@ -27,19 +31,60 @@ export const PoseScreen = () => {
   const [cameraType, setCameraType] = useState<CameraType>(
     Camera.Constants.Type.back
   );
+  const [percentage, setPercentage] = useState(0);
+  const [success, setSuccess] = useState(false);
+  const [timerRunning, setTimerRunning] = useState(false);
+  const [startTime, setStartTime] = useState(0);
+  const [elapsedTime, setElapsedTime] = useState(0);
+  const [intervalId, setIntervalId] = useState(null);
+  const [timerStarted, setTimerStarted] = useState(false);
+
+  const startTimer = () => {
+    setStartTime(Date.now() - elapsedTime);
+    setTimerRunning(true);
+  };
+
+  const stopTimer = () => {
+    setTimerRunning(false);
+    if (intervalId) {
+      clearInterval(intervalId);
+    }
+    setElapsedTime(Date.now() - startTime);
+  };
+
+  useEffect(() => {
+    if (timerRunning) {
+      const id = setInterval(() => {
+        const currentElapsedTime = Date.now() - startTime;
+        const currentPercentage = (currentElapsedTime / (60 * 1000)) * 100;
+        setPercentage(currentPercentage > 100 ? 100 : currentPercentage);
+
+        if (currentPercentage >= 100) {
+          setSuccess(true);
+          clearInterval(id);
+        }
+      }, 1000);
+      setIntervalId(id);
+    } else {
+      clearInterval(intervalId);
+    }
+
+    return () => {
+      if (intervalId) {
+        clearInterval(intervalId);
+      }
+    };
+  }, [timerRunning, startTime]);
 
   useEffect(() => {
     async function prepare() {
       rafId.current = null;
-
       await Camera.requestCameraPermissionsAsync();
       await tf.ready();
       const poseClassifierModel = await tf.loadLayersModel(
         "https://models.s3.jp-tok.cloud-object-storage.appdomain.cloud/model.json"
       );
-
       setPoseClassifier(poseClassifierModel);
-
       const model = await loadMoveNetModel();
       setModel(model);
 
@@ -71,6 +116,7 @@ export const PoseScreen = () => {
         Date.now()
       );
       setPoses(poses);
+
       tf.dispose([imageTensor]);
 
       if (rafId.current === 0) {
@@ -85,13 +131,25 @@ export const PoseScreen = () => {
       rafId.current = requestAnimationFrame(loop);
     };
 
-    loop();
+    !success ? loop() : null;
+  };
+
+  const handleTimer = (value: boolean) => {
+    console.log(value);
+    if (value) {
+      startTimer();
+      setTimerStarted(true);
+    }
+    if (!value) {
+      setTimerStarted(false);
+      stopTimer();
+    }
   };
 
   if (!tfReady) {
     return (
       <View style={styles.loadingMsg}>
-        <Text>Loading...</Text>
+        <ActivityIndicator animating={true} size="large" />
       </View>
     );
   } else {
@@ -108,10 +166,16 @@ export const PoseScreen = () => {
           onReady={handleCameraStream}
         />
         <PoseSkeleton
+          poseName={pose}
           poses={poses}
           poseClassifier={poseClassifier}
           cameraType={cameraType}
+          handleTimer={(value: boolean) => handleTimer(value)}
+          timerStarted={timerStarted}
         />
+
+        <CircularProgressBar radius={50} duration={0} percentage={percentage} />
+        <Text>{success ? "exercise completed" : ""}</Text>
       </View>
     );
   }
@@ -122,7 +186,6 @@ const styles = StyleSheet.create({
     position: "relative",
     width: cameraPreViewWidth,
     height: cameraPreViewHeight,
-    // marginTop: Dimensions.get("window").height / 2 - CAM_PREVIEW_HEIGHT / 2,
   },
 
   loadingMsg: {
