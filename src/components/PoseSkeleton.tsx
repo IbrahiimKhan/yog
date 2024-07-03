@@ -1,136 +1,114 @@
-import React, { FC, ReactElement, useState, useEffect } from "react";
+import React, { FC, useState } from "react";
 import { StyleSheet, View } from "react-native";
-import * as posedetection from "@tensorflow-models/pose-detection";
+import { Svg, Line, Circle } from "react-native-svg";
+import { Camera } from "expo-camera";
+import {
+  getOutputTensorHeight,
+  getOutputTensorWidth,
+  landMarksToEmbedding,
+} from "../helper";
 import {
   cameraPreViewHeight,
   cameraPreViewWidth,
   isAndroid,
   minKeyPointSCore,
-  outputTensorHeight,
-  outputTensorWidth,
 } from "../contants";
-import { Camera, CameraType } from "expo-camera";
-import Svg, { Circle, Line } from "react-native-svg";
 import { classNo, keypointConnections } from "../data";
-import * as tf from "@tensorflow/tfjs";
-import { landMarksToEmbedding } from "../helper";
 
-type PoseSkeletonProps = {
-  poses: posedetection.Pose[] | undefined;
-  cameraType: CameraType;
-};
+interface PoseSkeletonProps {
+  poses: any;
+  poseClassifier: any;
+  cameraType: any;
+}
 
-export const PoseSkeleton: FC<PoseSkeletonProps> = ({
+const PoseSkeleton: FC<PoseSkeletonProps> = ({
   poses,
+  poseClassifier,
   cameraType,
-}): ReactElement => {
-  const [keypoints, setKeypoints] = useState<ReactElement[] | null>([]);
-  const [lines, setLines] = useState<ReactElement[] | null>([]);
-  const [tfReady, setTfReady] = useState(false);
-  const [poseClassifier, setPoseClassifier] = useState<any>(null);
-  const [input, setInput] = useState<any>(null);
+}) => {
+  if (!poses || poses.length === 0) {
+    return <View />;
+  }
+  const [skeletonColor, setSkeletonColor] = useState<string>("red");
+  const renderPose = () => {
+    let input = poses[0].keypoints?.map((keypoint: any) => {
+      return [keypoint.x, keypoint.y];
+    });
+    const processedInput = landMarksToEmbedding(input);
+    const classification = poseClassifier.predict(processedInput);
+    classification.array().then((data: any) => {
+      const pose = classNo.Warrior;
+      if (data[0][pose] > 0.9) {
+        console.log(data[0][pose], "accuracy");
+        setSkeletonColor("green");
+      } else {
+        setSkeletonColor("red");
+      }
+    });
 
-  useEffect(() => {
-    if (poses != null && poses.length > 0) {
-      const keypointElements = poses[0].keypoints
-        .filter((k) => (k.score ?? 0) > minKeyPointSCore)
-        .map((k) => {
-          const flipX = isAndroid || cameraType === Camera.Constants.Type.back;
-          const x = flipX ? outputTensorWidth - k.x : k.x;
-          const y = k.y;
-          const cx = (x / outputTensorWidth) * cameraPreViewWidth;
-          const cy = (y / outputTensorHeight) * cameraPreViewHeight;
-          return (
-            <Circle
-              key={`skeletonkp_${k.name}`}
-              cx={cx}
-              cy={cy}
-              r="4"
-              strokeWidth="2"
-              fill="red"
-              stroke="white"
-            />
-          );
-        });
-
-      const lineElements = keypointConnections.map((line, idx) => {
-        const from = poses[0].keypoints.find((k) => k.name === line.from);
-        const to = poses[0].keypoints.find((k) => k.name === line.to);
-        if (
-          !from ||
-          !to ||
-          from.score < minKeyPointSCore ||
-          to.score < minKeyPointSCore
-        ) {
-          return null;
-        }
+    const keypoints = poses[0].keypoints
+      .filter((k: any) => (k.score ?? 0) > minKeyPointSCore)
+      .map((k: any) => {
         const flipX = isAndroid || cameraType === Camera.Constants.Type.back;
-        const x1 = flipX ? outputTensorWidth - from.x : from.x;
-        const y1 = from.y;
-        const x2 = flipX ? outputTensorWidth - to.x : to.x;
-        const y2 = to.y;
-        const cx1 = (x1 / outputTensorWidth) * cameraPreViewWidth;
-        const cy1 = (y1 / outputTensorHeight) * cameraPreViewHeight;
-        const cx2 = (x2 / outputTensorWidth) * cameraPreViewWidth;
-        const cy2 = (y2 / outputTensorHeight) * cameraPreViewHeight;
+        const x = flipX ? getOutputTensorWidth() - k.x : k.x;
+        const y = k.y;
+        const cx = (x / getOutputTensorWidth()) * cameraPreViewWidth;
+        const cy = (y / getOutputTensorHeight()) * cameraPreViewHeight;
         return (
-          <Line
-            key={`skeletonline_${idx}`}
-            x1={cx1}
-            y1={cy1}
-            x2={cx2}
-            y2={cy2}
-            stroke="white"
+          <Circle
+            key={`skeletonkp_${k.name}`}
+            cx={cx}
+            cy={cy}
+            r="4"
             strokeWidth="2"
+            fill={skeletonColor}
+            stroke="white"
           />
         );
       });
 
-      setKeypoints(keypointElements);
-      setLines(lineElements);
-      let input = poses[0].keypoints?.map((keypoint) => {
-        return [keypoint.x, keypoint.y];
-      });
-      setInput(input);
-    } else {
-      setKeypoints([]);
-      setLines([]);
-    }
-  }, [poses, cameraType]);
-
-  useEffect(() => {
-    async function prepare() {
-      await tf.ready();
-      const poseClassifierModel = await tf.loadLayersModel(
-        "https://models.s3.jp-tok.cloud-object-storage.appdomain.cloud/model.json"
-      );
-      setPoseClassifier(poseClassifierModel);
-      setTfReady(true);
-    }
-
-    prepare();
-  }, []);
-
-  if (input) {
-    const processedInput = landMarksToEmbedding(input);
-    const classification = poseClassifier.predict(processedInput);
-    classification.array().then((data: any) => {
-      const result = classNo.Tree;
-      console.log(data[0], "accracy");
-      if (data[0][result] > 0.97) {
-        console.log("pose name is", result);
-      } else {
-        console.log("there some errors");
+    const lines = keypointConnections.map((line, idx) => {
+      const from = poses[0].keypoints.find((k: any) => k.name === line.from);
+      const to = poses[0].keypoints.find((k: any) => k.name === line.to);
+      if (
+        !from ||
+        !to ||
+        from.score < minKeyPointSCore ||
+        to.score < minKeyPointSCore
+      ) {
+        return null;
       }
+      const flipX = isAndroid || cameraType === Camera.Constants.Type.back;
+      const x1 = flipX ? getOutputTensorWidth() - from.x : from.x;
+      const y1 = from.y;
+      const x2 = flipX ? getOutputTensorWidth() - to.x : to.x;
+      const y2 = to.y;
+      const cx1 = (x1 / getOutputTensorWidth()) * cameraPreViewWidth;
+      const cy1 = (y1 / getOutputTensorHeight()) * cameraPreViewHeight;
+      const cx2 = (x2 / getOutputTensorWidth()) * cameraPreViewWidth;
+      const cy2 = (y2 / getOutputTensorHeight()) * cameraPreViewHeight;
+      return (
+        <Line
+          key={`skeletonline_${idx}`}
+          x1={cx1}
+          y1={cy1}
+          x2={cx2}
+          y2={cy2}
+          stroke={skeletonColor}
+          strokeWidth="2"
+        />
+      );
     });
-  }
 
-  return (
-    <Svg style={styles.svg}>
-      {keypoints}
-      {lines}
-    </Svg>
-  );
+    return (
+      <Svg style={styles.svg}>
+        {keypoints}
+        {lines}
+      </Svg>
+    );
+  };
+
+  return renderPose();
 };
 
 export default PoseSkeleton;

@@ -1,5 +1,14 @@
 import * as tf from "@tensorflow/tfjs";
+import { isAndroid, outputTensorHeight, outputTensorWidth } from "../contants";
 import { points } from "../data";
+
+export const getOutputTensorWidth = () => {
+  return isAndroid ? outputTensorWidth : outputTensorHeight;
+};
+
+export const getOutputTensorHeight = () => {
+  return isAndroid ? outputTensorHeight : outputTensorWidth;
+};
 
 const getCenterPoints = (
   landmarks: tf.Tensor,
@@ -24,15 +33,15 @@ const getPoseSize = (landmarks: tf.Tensor, torso_size_multiplier = 2.5) => {
     points.RIGHT_SHOULDER
   );
   const torso_size = tf.norm(tf.sub(shoulders_center, hips_center));
-  let pose_center_new = getCenterPoints(
+  let poseCenterNew = getCenterPoints(
     landmarks,
     points.LEFT_HIP,
     points.RIGHT_HIP
   );
-  pose_center_new = tf.expandDims(pose_center_new, 1);
-  pose_center_new = tf.broadcastTo(pose_center_new, [1, 17, 2]);
+  poseCenterNew = tf.expandDims(poseCenterNew, 1);
+  poseCenterNew = tf.broadcastTo(poseCenterNew, [1, 17, 2]);
 
-  const d = tf.gather(tf.sub(landmarks, pose_center_new), 0, 0);
+  const d = tf.gather(tf.sub(landmarks, poseCenterNew), 0, 0);
   const max_dist = tf.max(tf.norm(d, "euclidean", 0));
 
   const pose_size = tf.maximum(
@@ -57,7 +66,7 @@ const normalisePoseLandmarks = (landmarks: tf.Tensor) => {
   return landmarks;
 };
 
-export const landMarksToEmbedding = (landmarks: tf.Tensor) => {
+export const landMarksToEmbedding = (landmarks: any) => {
   const normalizedLandmarks = normalisePoseLandmarks(
     tf.expandDims(landmarks, 0)
   );
