@@ -6,24 +6,14 @@ import { CameraType } from "expo-camera/build/Camera.types";
 import { ExpoWebGLRenderingContext } from "expo-gl";
 import React, { useEffect, useRef, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
-import Svg, { Circle, Line } from "react-native-svg";
 import { loadMoveNetModel } from "../../model";
+import PoseSkeleton from "../components/PoseSkeleton";
 import {
   autoRender,
   cameraPreViewHeight,
   cameraPreViewWidth,
-  isAndroid,
-  minKeyPointSCore,
-  outputTensorHeight,
-  outputTensorWidth,
 } from "../contants";
-import { classNo, keypointConnections } from "../data";
-import {
-  getOutputTensorHeight,
-  getOutputTensorWidth,
-  landMarksToEmbedding,
-} from "../helper";
-import PoseSkeleton from "../components/PoseSkeleton";
+import { getOutputTensorHeight, getOutputTensorWidth } from "../helper";
 
 const TensorCamera = cameraWithTensors(Camera);
 
@@ -106,7 +96,7 @@ export const PoseScreen = () => {
     );
   } else {
     return (
-      <View style={styles.containerPortrait}>
+      <View style={styles.container}>
         <TensorCamera
           ref={cameraRef}
           style={styles.camera}
@@ -128,7 +118,7 @@ export const PoseScreen = () => {
 };
 
 const styles = StyleSheet.create({
-  containerPortrait: {
+  container: {
     position: "relative",
     width: cameraPreViewWidth,
     height: cameraPreViewHeight,
@@ -146,33 +136,5 @@ const styles = StyleSheet.create({
     width: "100%",
     height: "100%",
     zIndex: 1,
-  },
-  svg: {
-    width: "100%",
-    height: "100%",
-    position: "absolute",
-    zIndex: 30,
-  },
-  fpsContainer: {
-    position: "absolute",
-    top: 10,
-    left: 10,
-    width: 80,
-    alignItems: "center",
-    backgroundColor: "rgba(255, 255, 255, .7)",
-    borderRadius: 2,
-    padding: 8,
-    zIndex: 20,
-  },
-  cameraTypeSwitcher: {
-    position: "absolute",
-    top: 10,
-    right: 10,
-    width: 180,
-    alignItems: "center",
-    backgroundColor: "rgba(255, 255, 255, .7)",
-    borderRadius: 2,
-    padding: 8,
-    zIndex: 20,
   },
 });
