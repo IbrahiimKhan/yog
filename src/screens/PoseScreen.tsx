@@ -136,7 +136,6 @@ export const PoseScreen = ({ route }: any) => {
   };
 
   const handleTimer = (value: boolean) => {
-    console.log(value);
     if (value) {
       startTimer();
       setTimerStarted(true);

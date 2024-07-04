@@ -11,7 +11,6 @@ type YogaCardProps = {
 
 export const YogaCard: FC<YogaCardProps> = ({ title }): ReactElement => {
   const navigation = useNavigation();
-  console.log(title);
   return (
     <TouchableOpacity
       onPress={() => navigation.navigate("POSE", { pose: title })}
