@@ -2,6 +2,7 @@ import { Camera } from "expo-camera";
 import React, { FC, useState } from "react";
 import { StyleSheet, View } from "react-native";
 import { Circle, Line, Svg } from "react-native-svg";
+import * as posedetection from "@tensorflow-models/pose-detection";
 import {
   cameraPreViewHeight,
   cameraPreViewWidth,
@@ -17,7 +18,7 @@ import {
 
 interface PoseSkeletonProps {
   poseName: string;
-  poses: any;
+  poses: posedetection.Pose[] | undefined;
   poseClassifier: any;
   cameraType: any;
   handleTimer: (value: boolean) => void;
@@ -35,13 +36,17 @@ const PoseSkeleton: FC<PoseSkeletonProps> = ({
   if (!poses || poses.length === 0) {
     return <View />;
   }
+
+  //variables and states
   const [skeletonColor, setSkeletonColor] = useState<string>("red");
 
+  //render the skeleton
   const renderPose = () => {
     let input = poses[0].keypoints?.map((keypoint: any) => {
       return [keypoint.x, keypoint.y];
     });
     const processedInput = landMarksToEmbedding(input);
+
     const classification = poseClassifier.predict(processedInput);
     classification.array().then((data: any) => {
       const pose = classNo[poseName];
@@ -58,6 +63,7 @@ const PoseSkeleton: FC<PoseSkeletonProps> = ({
       }
     });
 
+    //skeleton keypoints
     const keypoints = poses[0].keypoints
       .filter((k: any) => (k.score ?? 0) > minKeyPointSCore)
       .map((k: any) => {
@@ -79,6 +85,7 @@ const PoseSkeleton: FC<PoseSkeletonProps> = ({
         );
       });
 
+    //skeleton lines
     const lines = keypointConnections.map((line, idx) => {
       const from = poses[0].keypoints.find((k: any) => k.name === line.from);
       const to = poses[0].keypoints.find((k: any) => k.name === line.to);
@@ -90,6 +97,7 @@ const PoseSkeleton: FC<PoseSkeletonProps> = ({
       ) {
         return null;
       }
+
       const flipX = isAndroid || cameraType === Camera.Constants.Type.back;
       const x1 = flipX ? getOutputTensorWidth() - from.x : from.x;
       const y1 = from.y;
@@ -99,6 +107,7 @@ const PoseSkeleton: FC<PoseSkeletonProps> = ({
       const cy1 = (y1 / getOutputTensorHeight()) * cameraPreViewHeight;
       const cx2 = (x2 / getOutputTensorWidth()) * cameraPreViewWidth;
       const cy2 = (y2 / getOutputTensorHeight()) * cameraPreViewHeight;
+
       return (
         <Line
           key={`skeletonline_${idx}`}
