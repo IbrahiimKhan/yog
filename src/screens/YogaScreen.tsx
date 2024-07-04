@@ -1,10 +1,9 @@
 import { useNavigation } from "@react-navigation/native";
 import React, { ReactElement } from "react";
 import { FlatList, StyleSheet } from "react-native";
-import SectionHeader from "../components/SectionHeader";
+import { SafeAreaView } from "react-native-safe-area-context";
 import YogaCard from "../components/YogaCard";
 import { poseInstructions } from "../data";
-import { SafeAreaView } from "react-native-safe-area-context";
 
 export const YogaScreen = ({ route }: { route: any }): ReactElement => {
   const navigation = useNavigation();

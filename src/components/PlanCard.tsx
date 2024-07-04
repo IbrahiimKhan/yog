@@ -1,5 +1,5 @@
 import React, { FC } from "react";
-import { ImageBackground, StyleSheet, View } from "react-native";
+import { ImageBackground, StyleSheet } from "react-native";
 
 export type PlanCardProps = {
   level: "Easy" | "Normal" | "Hard";

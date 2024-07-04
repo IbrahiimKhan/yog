@@ -1,10 +1,10 @@
 import chair from "../../assets/images/yoga/chair.png";
 import cobra from "../../assets/images/yoga/cobra.jpg";
 import dog from "../../assets/images/yoga/dog.jpg";
+import shoulderstand from "../../assets/images/yoga/shoulderstand.jpg";
+import traingle from "../../assets/images/yoga/traingle.jpg";
 import tree from "../../assets/images/yoga/tree.jpg";
 import warrior from "../../assets/images/yoga/warrior.jpg";
-import traingle from "../../assets/images/yoga/traingle.jpg";
-import shoulderstand from "../../assets/images/yoga/shoulderstand.jpg";
 
 export const poseInstructions = [
   {

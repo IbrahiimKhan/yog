@@ -5,9 +5,10 @@ import { Camera } from "expo-camera";
 import { CameraType } from "expo-camera/build/Camera.types";
 import { ExpoWebGLRenderingContext } from "expo-gl";
 import React, { useEffect, useRef, useState } from "react";
-import { Dimensions, Image, StyleSheet, View } from "react-native";
-import { ActivityIndicator, Button, Text } from "react-native-paper";
+import { StyleSheet, View } from "react-native";
+import { ActivityIndicator, Button } from "react-native-paper";
 import { loadMoveNetModel } from "../../model";
+import PoseBottomInfo from "../components/PoseBottomInfo";
 import PoseSkeleton from "../components/PoseSkeleton";
 import {
   autoRender,
@@ -16,8 +17,6 @@ import {
 } from "../contants";
 import { poseImages } from "../data";
 import { getOutputTensorHeight, getOutputTensorWidth } from "../helper";
-import CircularProgressBar from "../components/CircularProgressBar";
-import PoseBottomInfo from "../components/PoseBottomInfo";
 
 const TensorCamera = cameraWithTensors(Camera);
 

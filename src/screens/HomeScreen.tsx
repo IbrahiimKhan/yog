@@ -1,13 +1,10 @@
 import { useNavigation } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import React, { ReactElement } from "react";
 import { SafeAreaView, StyleSheet, TouchableOpacity } from "react-native";
 import PlanCard, { PlanCardProps } from "../components/PlanCard";
 import SectionHeader from "../components/SectionHeader";
-import {
-  RootNavigatorScreenProps,
-  RootNavigatorParamList,
-} from "../types/navigation";
-import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { RootNavigatorParamList } from "../types/navigation";
 
 const levels: PlanCardProps["level"][] = ["Easy", "Normal", "Hard"];
 

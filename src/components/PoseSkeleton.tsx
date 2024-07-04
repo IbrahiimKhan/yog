@@ -1,12 +1,7 @@
+import { Camera } from "expo-camera";
 import React, { FC, useState } from "react";
 import { StyleSheet, View } from "react-native";
-import { Svg, Line, Circle } from "react-native-svg";
-import { Camera } from "expo-camera";
-import {
-  getOutputTensorHeight,
-  getOutputTensorWidth,
-  landMarksToEmbedding,
-} from "../helper";
+import { Circle, Line, Svg } from "react-native-svg";
 import {
   cameraPreViewHeight,
   cameraPreViewWidth,
@@ -14,6 +9,11 @@ import {
   minKeyPointSCore,
 } from "../contants";
 import { classNo, keypointConnections } from "../data";
+import {
+  getOutputTensorHeight,
+  getOutputTensorWidth,
+  landMarksToEmbedding,
+} from "../helper";
 
 interface PoseSkeletonProps {
   poseName: string;

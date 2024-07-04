@@ -1,9 +1,8 @@
+import { useNavigation } from "@react-navigation/native";
 import React, { FC, ReactElement } from "react";
 import { Image, StyleSheet, TouchableOpacity } from "react-native";
-import { Surface } from "react-native-paper";
+import { Surface, Text } from "react-native-paper";
 import { poseImages } from "../data";
-import { Text } from "react-native-paper";
-import { useNavigation } from "@react-navigation/native";
 
 type YogaCardProps = {
   title: string;

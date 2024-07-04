@@ -1,5 +1,5 @@
 import React, { FC, ReactElement, useEffect, useRef, useState } from "react";
-import { Animated, Easing, StyleSheet, View, Text } from "react-native";
+import { Animated, Easing, StyleSheet, Text, View } from "react-native";
 import Svg, { Circle, Defs, G, LinearGradient, Stop } from "react-native-svg";
 
 interface CircularProgressBarProps {
@@ -17,7 +17,6 @@ interface valueTypeProps {
 }
 
 const AnimatedCircle = Animated.createAnimatedComponent(Circle);
-const AnimatedText = Animated.createAnimatedComponent(Text);
 
 const CircularProgressBar: FC<CircularProgressBarProps> = ({
   percentage = 90,

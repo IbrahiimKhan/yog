@@ -4,8 +4,8 @@ import {
   Image,
   ImageSourcePropType,
   StyleSheet,
-  View,
   Text,
+  View,
 } from "react-native";
 import CircularProgressBar from "./CircularProgressBar";
 

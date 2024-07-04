@@ -1,8 +1,8 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import * as React from "react";
 import { HomeScreen } from "../screens/HomeScreen";
-import { YogaScreen } from "../screens/YogaScreen";
 import { PoseScreen } from "../screens/PoseScreen";
+import { YogaScreen } from "../screens/YogaScreen";
 
 const Stack = createNativeStackNavigator();
 
