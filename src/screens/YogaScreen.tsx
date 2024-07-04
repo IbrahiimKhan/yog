@@ -6,9 +6,7 @@ import YogaCard from "../components/YogaCard";
 import { poseInstructions } from "../data";
 
 export const YogaScreen = ({ route }: { route: any }): ReactElement => {
-  const navigation = useNavigation();
   const { plan } = route.params;
-
   const poses = poseInstructions.filter((pose) => pose.difficulty === plan);
 
   return (

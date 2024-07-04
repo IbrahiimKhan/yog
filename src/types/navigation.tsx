@@ -8,7 +8,7 @@ export interface NavigationProps
 export type RootNavigatorParamList = {
   ROOT: undefined;
   YOGA: { plan: string };
-  POSE: undefined;
+  POSE: { pose: string };
 };
 
 export type RootNavigatorScreenProps<T extends keyof RootNavigatorParamList> =

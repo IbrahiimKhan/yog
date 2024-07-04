@@ -5,7 +5,7 @@ import { Camera } from "expo-camera";
 import { CameraType } from "expo-camera/build/Camera.types";
 import { ExpoWebGLRenderingContext } from "expo-gl";
 import React, { useEffect, useRef, useState } from "react";
-import { StyleSheet, View } from "react-native";
+import { ImageSourcePropType, StyleSheet, View } from "react-native";
 import { ActivityIndicator, Button } from "react-native-paper";
 import { loadMoveNetModel } from "../../model";
 import PoseBottomInfo from "../components/PoseBottomInfo";
@@ -21,6 +21,7 @@ import { getOutputTensorHeight, getOutputTensorWidth } from "../helper";
 const TensorCamera = cameraWithTensors(Camera);
 
 export const PoseScreen = ({ route }: any) => {
+  //states & variables
   const { pose } = route.params;
   const cameraRef = useRef(null);
   const rafId = useRef<number | null>(null);
@@ -39,11 +40,13 @@ export const PoseScreen = ({ route }: any) => {
   const [intervalId, setIntervalId] = useState(null);
   const [timerStarted, setTimerStarted] = useState(false);
 
+  //start the timer
   const startTimer = () => {
     setStartTime(Date.now() - elapsedTime);
     setTimerRunning(true);
   };
 
+  //stop the timer
   const stopTimer = () => {
     setTimerRunning(false);
     if (intervalId) {
@@ -52,6 +55,7 @@ export const PoseScreen = ({ route }: any) => {
     setElapsedTime(Date.now() - startTime);
   };
 
+  //handle timer
   useEffect(() => {
     if (timerRunning) {
       const id = setInterval(() => {
@@ -76,6 +80,7 @@ export const PoseScreen = ({ route }: any) => {
     };
   }, [timerRunning, startTime]);
 
+  //initialize models & tf related staff
   useEffect(() => {
     async function prepare() {
       rafId.current = null;
@@ -94,6 +99,7 @@ export const PoseScreen = ({ route }: any) => {
     prepare();
   }, []);
 
+  //change the rafid ref value
   useEffect(() => {
     return () => {
       if (rafId.current != null && rafId.current !== 0) {
@@ -103,6 +109,7 @@ export const PoseScreen = ({ route }: any) => {
     };
   }, []);
 
+  //handle expo camera & feed the video to model
   const handleCameraStream = async (
     images: IterableIterator<tf.Tensor3D>,
     updatePreview: () => void,
@@ -134,6 +141,7 @@ export const PoseScreen = ({ route }: any) => {
     !success ? loop() : null;
   };
 
+  //handle the timer from skeleton screen
   const handleTimer = (value: boolean) => {
     if (value) {
       startTimer();
@@ -145,6 +153,7 @@ export const PoseScreen = ({ route }: any) => {
     }
   };
 
+  //alter the camera
   const handleCamersSwitch = () => {
     setCameraType(
       cameraType === Camera.Constants.Type.front
@@ -183,7 +192,9 @@ export const PoseScreen = ({ route }: any) => {
           />
         ) : null}
         <PoseBottomInfo
-          img={poseImages[pose]}
+          img={
+            poseImages[pose as keyof typeof poseImages] as ImageSourcePropType
+          }
           success={success}
           percentage={percentage}
         />

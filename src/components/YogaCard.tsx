@@ -1,6 +1,11 @@
 import { useNavigation } from "@react-navigation/native";
 import React, { FC, ReactElement } from "react";
-import { Image, StyleSheet, TouchableOpacity } from "react-native";
+import {
+  Image,
+  ImageSourcePropType,
+  StyleSheet,
+  TouchableOpacity,
+} from "react-native";
 import { Surface, Text } from "react-native-paper";
 import { poseImages } from "../data";
 
@@ -10,13 +15,16 @@ type YogaCardProps = {
 
 export const YogaCard: FC<YogaCardProps> = ({ title }): ReactElement => {
   const navigation = useNavigation();
+
   return (
     <TouchableOpacity
       onPress={() => navigation.navigate("POSE", { pose: title })}
     >
       <Surface elevation={1} style={styles.surface}>
         <Image
-          source={poseImages[title]}
+          source={
+            poseImages[title as keyof typeof poseImages] as ImageSourcePropType
+          }
           resizeMode="contain"
           style={{ width: 150, height: 150 }}
         />

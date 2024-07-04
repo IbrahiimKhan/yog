@@ -16,7 +16,8 @@ type HomeScreenNavigationProp = NativeStackNavigationProp<
 export const HomeScreen = (): ReactElement => {
   const navigation = useNavigation<HomeScreenNavigationProp>();
 
-  const navigateToPlan = (plan: PlanCardProps["level"]) => {
+  //navigate to yoga screen
+  const navigateToYogaScreen = (plan: PlanCardProps["level"]) => {
     navigation.navigate("YOGA", { plan });
   };
 
@@ -26,7 +27,7 @@ export const HomeScreen = (): ReactElement => {
       {levels.map((level) => (
         <TouchableOpacity
           key={level}
-          onPress={() => navigateToPlan(level)}
+          onPress={() => navigateToYogaScreen(level)}
           style={styles.planCard}
         >
           <PlanCard level={level} />
