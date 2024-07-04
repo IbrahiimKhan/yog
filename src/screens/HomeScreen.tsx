@@ -1,15 +1,25 @@
 import { useNavigation } from "@react-navigation/native";
 import React, { ReactElement } from "react";
 import { SafeAreaView, StyleSheet, TouchableOpacity } from "react-native";
-import PlanCard from "../components/PlanCard";
+import PlanCard, { PlanCardProps } from "../components/PlanCard";
 import SectionHeader from "../components/SectionHeader";
+import {
+  RootNavigatorScreenProps,
+  RootNavigatorParamList,
+} from "../types/navigation";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
-const levels = ["Easy", "Normal", "Hard"];
+const levels: PlanCardProps["level"][] = ["Easy", "Normal", "Hard"];
+
+type HomeScreenNavigationProp = NativeStackNavigationProp<
+  RootNavigatorParamList,
+  "YOGA"
+>;
 
 export const HomeScreen = (): ReactElement => {
-  const navigation = useNavigation();
+  const navigation = useNavigation<HomeScreenNavigationProp>();
 
-  const navigateToPlan = (plan: string) => {
+  const navigateToPlan = (plan: PlanCardProps["level"]) => {
     navigation.navigate("YOGA", { plan });
   };
 
