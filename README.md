@@ -1,7 +1,6 @@
 # Overview
 
-A Yoga which estimate human pose  & classify  using movenet model of tensorflow js. 
-
+ A yoga app integrated TensorFlow's MoveNet model for precise pose estimation, detecting 17 key points on the human body with remarkable accuracy using TensorFlow.js.
 
 To run it locally:
 
@@ -10,14 +9,8 @@ $ yarn
 $ yarn start
 ```
 
-# DEmo
+[[Tensorflow pose estimation documentaion](https://www.tensorflow.org/lite/examples/pose_estimation/overview)]:
+
+# Demo Video of the app
 
 https://github.com/IbrahiimKhan/yog/assets/47632415/d2484082-6a30-45a3-96c8-7234dca25707
-
-# Links
-
-[posedetection]: https://github.com/tensorflow/tfjs-models/tree/master/pose-detection
-[tfhub]: https://tfhub.dev/google/tfjs-model/movenet/singlepose/lightning/4
-[tfjs-react-native]: https://github.com/tensorflow/tfjs/tree/master/tfjs-react-native
-[screenshots]: https://photos.app.goo.gl/U972ww4HpaKPK6jEA
-[readme]: https://github.com/tensorflow/tfjs-examples/blob/master/react-native/README.md
