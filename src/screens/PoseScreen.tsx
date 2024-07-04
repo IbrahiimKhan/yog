@@ -5,7 +5,7 @@ import { Camera } from "expo-camera";
 import { CameraType } from "expo-camera/build/Camera.types";
 import { ExpoWebGLRenderingContext } from "expo-gl";
 import React, { useEffect, useRef, useState } from "react";
-import { Image, StyleSheet, View } from "react-native";
+import { Dimensions, Image, StyleSheet, View } from "react-native";
 import { ActivityIndicator, Text } from "react-native-paper";
 import { loadMoveNetModel } from "../../model";
 import PoseSkeleton from "../components/PoseSkeleton";
@@ -17,6 +17,7 @@ import {
 import { poseImages } from "../data";
 import { getOutputTensorHeight, getOutputTensorWidth } from "../helper";
 import CircularProgressBar from "../components/CircularProgressBar";
+import PoseBottomInfo from "../components/PoseBottomInfo";
 
 const TensorCamera = cameraWithTensors(Camera);
 
@@ -173,9 +174,7 @@ export const PoseScreen = ({ route }: any) => {
           handleTimer={(value: boolean) => handleTimer(value)}
           timerStarted={timerStarted}
         />
-
-        <CircularProgressBar radius={50} duration={0} percentage={percentage} />
-        <Text>{success ? "exercise completed" : ""}</Text>
+        <PoseBottomInfo img={poseImages[pose]} success={success} />
       </View>
     );
   }

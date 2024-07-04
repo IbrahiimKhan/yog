@@ -54,7 +54,9 @@ const CircularProgressBar: FC<CircularProgressBarProps> = ({
         circumference - (circumference * maxPercentage) / 100;
       setDisplayText(`${Math.round(v.value)}%`);
 
-      circleRef.current?.setNativeProps({ strokeDashoffset });
+      if (circleRef.current) {
+        circleRef.current.setNativeProps({ strokeDashoffset });
+      }
     };
 
     animatedValue.addListener(listener);
@@ -103,13 +105,13 @@ const CircularProgressBar: FC<CircularProgressBarProps> = ({
             r={radius}
             fill="transparent"
             strokeDasharray={circumference}
-            strokeDashoffset={0}
+            strokeDashoffset={circumference}
             strokeLinecap="round"
           />
         </G>
       </Svg>
       <Animated.Text style={[styles.text, { color: textColor }]}>
-        {displayText}
+        {displayText ? displayText : 0}
       </Animated.Text>
     </View>
   );
