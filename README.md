@@ -2,6 +2,7 @@
 
 A Yoga which estimate human pose  & classify  using movenet model of tensorflow js. 
 
+
 To run it locally:
 
 ```
@@ -9,11 +10,11 @@ $ yarn
 $ yarn start
 ```
 
-#Demo
+# DEmo
 
 https://github.com/IbrahiimKhan/yog/assets/47632415/d2484082-6a30-45a3-96c8-7234dca25707
 
-#Links
+# Links
 
 [posedetection]: https://github.com/tensorflow/tfjs-models/tree/master/pose-detection
 [tfhub]: https://tfhub.dev/google/tfjs-model/movenet/singlepose/lightning/4
