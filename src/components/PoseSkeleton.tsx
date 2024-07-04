@@ -44,9 +44,8 @@ const PoseSkeleton: FC<PoseSkeletonProps> = ({
     const processedInput = landMarksToEmbedding(input);
     const classification = poseClassifier.predict(processedInput);
     classification.array().then((data: any) => {
-      const pose = classNo.Warrior;
+      const pose = classNo[poseName];
       if (data[0][pose] > 0.9) {
-        console.log(data[0][pose], "accuracy");
         if (!timerStarted) {
           handleTimer(true);
         }
