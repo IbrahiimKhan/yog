@@ -6,7 +6,7 @@ import { CameraType } from "expo-camera/build/Camera.types";
 import { ExpoWebGLRenderingContext } from "expo-gl";
 import React, { useEffect, useRef, useState } from "react";
 import { Dimensions, Image, StyleSheet, View } from "react-native";
-import { ActivityIndicator, Text } from "react-native-paper";
+import { ActivityIndicator, Button, Text } from "react-native-paper";
 import { loadMoveNetModel } from "../../model";
 import PoseSkeleton from "../components/PoseSkeleton";
 import {
@@ -57,7 +57,7 @@ export const PoseScreen = ({ route }: any) => {
     if (timerRunning) {
       const id = setInterval(() => {
         const currentElapsedTime = Date.now() - startTime;
-        const currentPercentage = (currentElapsedTime / (60 * 1000)) * 100;
+        const currentPercentage = (currentElapsedTime / (30 * 1000)) * 100;
         setPercentage(currentPercentage > 100 ? 100 : currentPercentage);
 
         if (currentPercentage >= 100) {
@@ -147,6 +147,14 @@ export const PoseScreen = ({ route }: any) => {
     }
   };
 
+  const handleCamersSwitch = () => {
+    setCameraType(
+      cameraType === Camera.Constants.Type.front
+        ? Camera.Constants.Type.back
+        : Camera.Constants.Type.front
+    );
+  };
+
   if (!tfReady) {
     return (
       <View style={styles.loadingMsg}>
@@ -166,15 +174,29 @@ export const PoseScreen = ({ route }: any) => {
           resizeDepth={3}
           onReady={handleCameraStream}
         />
-        <PoseSkeleton
-          poseName={pose}
-          poses={poses}
-          poseClassifier={poseClassifier}
-          cameraType={cameraType}
-          handleTimer={(value: boolean) => handleTimer(value)}
-          timerStarted={timerStarted}
+        {percentage !== 100 ? (
+          <PoseSkeleton
+            poseName={pose}
+            poses={poses}
+            poseClassifier={poseClassifier}
+            cameraType={cameraType}
+            handleTimer={(value: boolean) => handleTimer(value)}
+            timerStarted={timerStarted}
+          />
+        ) : null}
+        <PoseBottomInfo
+          img={poseImages[pose]}
+          success={success}
+          percentage={percentage}
         />
-        <PoseBottomInfo img={poseImages[pose]} success={success} />
+        <Button
+          icon="camera"
+          mode="contained"
+          onPress={handleCamersSwitch}
+          style={{ marginVertical: 10 }}
+        >
+          Chanege Camera
+        </Button>
       </View>
     );
   }
