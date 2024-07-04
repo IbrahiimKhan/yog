@@ -1,10 +1,6 @@
 # Overview
 
-A quick demo for running [TFJS Pose Detection][posedetection] model
-([MoveNet.SinglePose.Ligntning][tfhub]) using
-[TFJS React Native][tfjs-react-native] in an Expo project. It supports both
-portrait and landscape mode with front and back camera. Only the keypoints are
-rendered in the demo.
+A Yoga which estimate human pose  & classify  using movenet model of tensorflow js. 
 
 To run it locally:
 
@@ -13,12 +9,11 @@ $ yarn
 $ yarn start
 ```
 
-Then scan the QR code to open it in the `Expo Go` app.
+#Demo
 
-If the app crashes on startup, see [here][readme] for more info.
+https://github.com/IbrahiimKhan/yog/assets/47632415/d2484082-6a30-45a3-96c8-7234dca25707
 
-<img src="screenshot_portrait.jpg" width="250">
-<img src="screenshot_landscape.jpg" width="500">
+#Links
 
 [posedetection]: https://github.com/tensorflow/tfjs-models/tree/master/pose-detection
 [tfhub]: https://tfhub.dev/google/tfjs-model/movenet/singlepose/lightning/4
